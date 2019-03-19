@@ -1,8 +1,11 @@
 import * as sbs1 from 'sbs1';
 import TelegramBot from 'node-telegram-bot-api'
 import { loadConfig } from './loadConfig';
+import { AirplaneService } from './airplaneService';
 
 const config = loadConfig();
+
+const airplaneService = new AirplaneService(config);
 
 // // TESTING SBS1 - logging messages for diagnostics examples
 // const sbsOptions: sbs1.Options = {
@@ -11,7 +14,9 @@ const config = loadConfig();
 // };
 // const sbsClient = sbs1.createClient(sbsOptions);
 // const sbsHandler: sbs1.Callback = function (message) {
-//     console.log(message);
+//     if (message.callsign) {
+//         console.log(message);
+//     }
 // }
 
 // sbsClient.on('message', sbsHandler);
