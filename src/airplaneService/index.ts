@@ -18,11 +18,14 @@ import { FlightCollection } from './flightCollection';
  *   - Generate flight path images on a map
  */
 
+const range = 2000;
+let prevCallsignLength = 0;
+
 export class AirplaneService {
     private readonly sbsClient: sbs1.Client;
     private readonly flights: FlightCollection;
 
-    constructor(config: AppConfig) {
+    public constructor(config: AppConfig) {
         this.flights = new FlightCollection();
 
         const sbsOptions: sbs1.Options = {
@@ -33,9 +36,25 @@ export class AirplaneService {
         this.sbsClient.on('message', this.onMessage.bind(this));
 
         setInterval(() => {
-            console.log('Hex: ', this.flights.getSeenHexes().join(', '));
-            console.log('Callsigns: ', this.flights.getSeenCallsigns().join(', '));
-        }, 5000);
+            const callsigns = this.flights.getAllCallsigns();
+            const length = callsigns.length;
+
+            if (length > prevCallsignLength) {
+                prevCallsignLength = length;
+                console.log(`Callsigns: ${callsigns.join(',')}`);
+            }
+        }, 1000);
+        setInterval(() => {
+            const inRange = Object.keys(this.flights.getFlightsInRange(
+                config.home_latitude,
+                config.home_longitude,
+                range
+            ));
+
+            if (inRange.length) {
+                console.log(inRange);
+            }
+        }, 1000);
     }
 
     private normalizeMessage(message: sbs1.Message): sbs1.Message {
@@ -47,15 +66,15 @@ export class AirplaneService {
         return message;
     }
 
-    private onMessage(message: sbs1.Message): void {
+    private onMessage(rawMsg: sbs1.Message): void {
         if (
-            !message.hex_ident ||
-            !message.generated_date ||
-            !message.generated_time
+            !rawMsg.hex_ident ||
+            !rawMsg.generated_date ||
+            !rawMsg.generated_time
         ) {
             return;
         }
 
-        this.flights.updateFlight(message);
+        this.flights.updateFlight(this.normalizeMessage(rawMsg));
     }
 }

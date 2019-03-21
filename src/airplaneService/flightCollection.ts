@@ -1,19 +1,19 @@
 import * as _ from 'underscore';
 import * as sbs1 from 'sbs1';
+import Geolib from 'geolib';
 
 interface Position {
-    altitude: number,
-    lat: number,
-    lon: number
+    altitude: number;
+    latitude: number;
+    longitude: number;
 }
 
 export interface Flight extends Position {
-    generated_date: string,
-    generated_time: string,
-    hex_ident: string,
-    callsign: string,
-    track: number,
-    path: Position[]
+    generatedDate: string;
+    generatedTime: string;
+    hexIdent: string;
+    callsign: string;
+    path: Position[];
 }
 
 export class FlightCollection {
@@ -23,14 +23,14 @@ export class FlightCollection {
     private hasPosition(position: Position): boolean {
         return !!(
             position.altitude ||
-            position.lat ||
-            position.lon
+            position.latitude ||
+            position.longitude
         );
     }
 
     private isMessageNewer(flight: Flight, message: sbs1.Message): boolean {
-        const flightDate = flight.generated_date.replace(/\//g, '-');
-        const flightTimestamp = `${flightDate}T${flight.generated_time}`;
+        const flightDate = flight.generatedDate.replace(/\//g, '-');
+        const flightTimestamp = `${flightDate}T${flight.generatedTime}`;
 
         const messageDate = message.generated_date.replace(/\//g, '-');
         const messageTimestamp = `${messageDate}T${message.generated_time}`;
@@ -41,11 +41,10 @@ export class FlightCollection {
     private insertFlight(message: sbs1.Message): Flight {
         const position: Position = _.pick(message, ['altitude', 'lat', 'lon']);
         const newFlight: Flight = {
-            generated_date: message.generated_date,
-            generated_time: message.generated_time,
-            hex_ident: message.hex_ident,
+            generatedDate: message.generated_date,
+            generatedTime: message.generated_time,
+            hexIdent: message.hex_ident,
             callsign: message.callsign,
-            track: message.track,
             path: [],
             ...position
         }
@@ -87,7 +86,7 @@ export class FlightCollection {
         }
     }
 
-    updateFlight(message: sbs1.Message) {
+    public updateFlight(message: sbs1.Message): void {
         const callsign = message.callsign ? message.callsign.trim() : null;
         let flight = this.flightsByHex[message.hex_ident];
 
@@ -102,10 +101,29 @@ export class FlightCollection {
         }
     }
 
-    getSeenHexes() {
+    /**
+     * Returns a list of
+     */
+    public getAllHexes(): string[] {
         return Object.keys(this.flightsByHex).sort();
     }
-    getSeenCallsigns() {
+
+    public getAllCallsigns(): string[] {
         return Object.keys(this.flightsByCallsign).sort();
+    }
+
+    public getFlightsInRange(latitude: number, longitude: number, radius: number): Flight[] {
+        return _.pick(
+            this.flightsByCallsign,
+            (flight: Flight) => {
+                if (!flight.latitude || !flight.longitude) return;
+
+                Geolib.isPointInCircle(
+                    _.pick(flight, ['latitude', 'longitude']),
+                    { latitude, longitude },
+                    radius
+                )
+            }
+        );
     }
 }

@@ -22,41 +22,41 @@ declare module 'sbs1' {
     }
 
     export interface Message {
-        message_type: string,
-        transmission_type: number,
-        session_id: string,
-        aircraft_id: string,
-        hex_ident: string,
-        flight_id: string,
-        generated_date: string,
-        generated_time: string,
-        logged_date: string,
-        logged_time: string,
-        callsign: string,
-        altitude: number,
-        ground_speed: number,
-        track: number,
-        lat: number,
-        lon: number,
-        vertical_rate: number,
-        squawk: string,
-        alert: boolean,
-        emergency: boolean,
-        spi: boolean,
-        is_on_ground: boolean,
-        parsed_time: string,
-        stringify: () => string
+        message_type: string;
+        transmission_type: number;
+        session_id: string;
+        aircraft_id: string;
+        hex_ident: string;
+        flight_id: string;
+        generated_date: string;
+        generated_time: string;
+        logged_date: string;
+        logged_time: string;
+        callsign: string;
+        altitude: number;
+        ground_speed: number;
+        track: number;
+        lat: number;
+        lon: number;
+        vertical_rate: number;
+        squawk: string;
+        alert: boolean;
+        emergency: boolean;
+        spi: boolean;
+        is_on_ground: boolean;
+        parsed_time: string;
+        stringify: () => string;
     }
 
     export interface Options {
-        host: string
-        port: number
+        host: string;
+        port: number;
     }
 
     export type Callback = (message: Message) => void
 
     export class Client extends EventEmitter {
-        constructor(options: Options)
+        public constructor(options: Options)
     }
 
     export function parseSbs1Message(message: string): Message
