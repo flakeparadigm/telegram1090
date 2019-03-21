@@ -12,6 +12,7 @@
         "@typescript-eslint"
     ],
     "rules": {
+        "semi": "error",
         "no-console": "off",
         "no-undef": "off",
         "no-useless-constructor": "off",

@@ -1,4 +1,5 @@
 import * as sbs1 from 'sbs1';
+import * as _ from 'underscore';
 import { AppConfig } from '../loadConfig';
 import { FlightCollection } from './flightCollection';
 
@@ -18,8 +19,9 @@ import { FlightCollection } from './flightCollection';
  *   - Generate flight path images on a map
  */
 
-const range = 2000;
+const range = 2500;
 let prevCallsignLength = 0;
+let prevInRange: string[] = [];
 
 export class AirplaneService {
     private readonly sbsClient: sbs1.Client;
@@ -46,13 +48,14 @@ export class AirplaneService {
         }, 1000);
         setInterval(() => {
             const inRange = Object.keys(this.flights.getFlightsInRange(
-                config.home_latitude,
-                config.home_longitude,
+                config.home_lat,
+                config.home_lon,
                 range
             ));
 
-            if (inRange.length) {
-                console.log(inRange);
+            if (!_.isEqual(inRange, prevInRange)) {
+                prevInRange = inRange;
+                console.log(`In range: ${inRange}`);
             }
         }, 1000);
     }

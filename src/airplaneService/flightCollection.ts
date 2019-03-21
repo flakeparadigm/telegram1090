@@ -1,11 +1,11 @@
 import * as _ from 'underscore';
 import * as sbs1 from 'sbs1';
-import Geolib from 'geolib';
+import { isPointInCircle } from 'geolib';
 
 interface Position {
     altitude: number;
-    latitude: number;
-    longitude: number;
+    lat: number;
+    lon: number;
 }
 
 export interface Flight extends Position {
@@ -22,9 +22,9 @@ export class FlightCollection {
 
     private hasPosition(position: Position): boolean {
         return !!(
-            position.altitude ||
-            position.latitude ||
-            position.longitude
+            position.altitude &&
+            position.lat &&
+            position.lon
         );
     }
 
@@ -39,7 +39,7 @@ export class FlightCollection {
     }
 
     private insertFlight(message: sbs1.Message): Flight {
-        const position: Position = _.pick(message, ['altitude', 'lat', 'lon']);
+        const position = _.pick(message, ['altitude', 'lat', 'lon']);
         const newFlight: Flight = {
             generatedDate: message.generated_date,
             generatedTime: message.generated_time,
@@ -47,7 +47,7 @@ export class FlightCollection {
             callsign: message.callsign,
             path: [],
             ...position
-        }
+        };
 
         // prevent adding empty positions to path
         if (this.hasPosition(position)) {
@@ -116,13 +116,19 @@ export class FlightCollection {
         return _.pick(
             this.flightsByCallsign,
             (flight: Flight) => {
-                if (!flight.latitude || !flight.longitude) return;
 
-                Geolib.isPointInCircle(
-                    _.pick(flight, ['latitude', 'longitude']),
+                if (!flight.lat || !flight.lon) return;
+
+                const flightCoordinates = {
+                    latitude: flight.lat,
+                    longitude: flight.lon
+                };
+
+                return isPointInCircle(
+                    flightCoordinates,
                     { latitude, longitude },
                     radius
-                )
+                );
             }
         );
     }

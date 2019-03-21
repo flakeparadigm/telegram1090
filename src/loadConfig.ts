@@ -5,8 +5,8 @@ const configPath = './secrets.json';
 export interface AppConfig {
     dump1090_host: string;
     dump1090_port: number;
-    home_latitude: number;
-    home_longitude: number;
+    home_lat: number;
+    home_lon: number;
     telegram_token: string;
 }
 
