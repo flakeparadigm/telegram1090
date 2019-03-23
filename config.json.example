@@ -4,6 +4,7 @@
 
     "home_lat": 0,
     "home_lon": 0,
+    "home_range": 750,
 
     "telegram_token": "Retrieved from Botfather"
 }

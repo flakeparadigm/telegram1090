@@ -1,7 +1,7 @@
 # Project-specific ignores
 dist
 persisted
-secrets.json
+config.json
 
 # Logs
 logs

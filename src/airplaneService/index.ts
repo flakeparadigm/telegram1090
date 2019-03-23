@@ -1,7 +1,7 @@
+import _ from 'underscore';
 import * as sbs1 from 'sbs1';
-import * as _ from 'underscore';
 import { AppConfig } from '../loadConfig';
-import { FlightCollection } from './flightCollection';
+import { FlightCollection, Flight } from './flightCollection';
 
 /**
  * Airplane Service
@@ -19,15 +19,13 @@ import { FlightCollection } from './flightCollection';
  *   - Generate flight path images on a map
  */
 
-const range = 2500;
-let prevCallsignLength = 0;
-let prevInRange: string[] = [];
-
 export class AirplaneService {
+    private readonly config: AppConfig;
     private readonly sbsClient: sbs1.Client;
     private readonly flights: FlightCollection;
 
     public constructor(config: AppConfig) {
+        this.config = config;
         this.flights = new FlightCollection();
 
         const sbsOptions: sbs1.Options = {
@@ -36,28 +34,6 @@ export class AirplaneService {
         };
         this.sbsClient = sbs1.createClient(sbsOptions);
         this.sbsClient.on('message', this.onMessage.bind(this));
-
-        setInterval(() => {
-            const callsigns = this.flights.getAllCallsigns();
-            const length = callsigns.length;
-
-            if (length > prevCallsignLength) {
-                prevCallsignLength = length;
-                console.log(`Callsigns: ${callsigns.join(',')}`);
-            }
-        }, 1000);
-        setInterval(() => {
-            const inRange = Object.keys(this.flights.getFlightsInRange(
-                config.home_lat,
-                config.home_lon,
-                range
-            ));
-
-            if (!_.isEqual(inRange, prevInRange)) {
-                prevInRange = inRange;
-                console.log(`In range: ${inRange}`);
-            }
-        }, 1000);
     }
 
     private normalizeMessage(message: sbs1.Message): sbs1.Message {
@@ -79,5 +55,13 @@ export class AirplaneService {
         }
 
         this.flights.updateFlight(this.normalizeMessage(rawMsg));
+    }
+
+    public getFlightsInRange(): Flight[] {
+        return this.flights.getFlightsInRange(
+            this.config.home_lat,
+            this.config.home_lon,
+            this.config.home_range
+        );
     }
 }

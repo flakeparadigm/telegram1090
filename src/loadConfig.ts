@@ -1,12 +1,13 @@
 import * as fs from 'fs';
 
-const configPath = './secrets.json';
+const configPath = './config.json';
 
 export interface AppConfig {
     dump1090_host: string;
     dump1090_port: number;
     home_lat: number;
     home_lon: number;
+    home_range: number;
     telegram_token: string;
 }
 

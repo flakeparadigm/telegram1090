@@ -1,4 +1,4 @@
-import * as _ from 'underscore';
+import _ from 'underscore';
 import * as sbs1 from 'sbs1';
 import { isPointInCircle } from 'geolib';
 
@@ -113,11 +113,10 @@ export class FlightCollection {
     }
 
     public getFlightsInRange(latitude: number, longitude: number, radius: number): Flight[] {
-        return _.pick(
+        return _.filter(
             this.flightsByCallsign,
             (flight: Flight) => {
-
-                if (!flight.lat || !flight.lon) return;
+                if (!flight.lat || !flight.lon) return false;
 
                 const flightCoordinates = {
                     latitude: flight.lat,
@@ -130,6 +129,6 @@ export class FlightCollection {
                     radius
                 );
             }
-        );
+        ) ;
     }
 }
