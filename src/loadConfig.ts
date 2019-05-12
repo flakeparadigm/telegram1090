@@ -8,6 +8,8 @@ export interface AppConfig {
     home_lat: number;
     home_lon: number;
     home_range: number;
+    persistence_base_dir: string;
+    persistence_save_interval: number;
     telegram_token: string;
 }
 

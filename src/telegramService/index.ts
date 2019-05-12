@@ -1,6 +1,7 @@
 import TelegramBot from 'node-telegram-bot-api';
 import { AppConfig } from '../loadConfig';
-import { SubscriptionHandler } from './subscriptionHandler';
+import { SubscriptionHandler, ChatIdList } from './subscriptionHandler';
+import { PersistenceService } from '../persistenceService';
 
 /**
  * Telegram Bot Service
@@ -18,18 +19,28 @@ import { SubscriptionHandler } from './subscriptionHandler';
 
 export class TelegramService {
     private readonly bot: TelegramBot;
+    private readonly persistence: PersistenceService<ChatIdList>;
     private readonly subscriptionHandler: SubscriptionHandler;
 
     public constructor(config: AppConfig) {
+        this.persistence = new PersistenceService<ChatIdList>('telegram', this.getPersistenceData.bind(this), config);
+
         this.bot = new TelegramBot(
             config.telegram_token,
             { polling: true }
         );
 
-        this.subscriptionHandler = new SubscriptionHandler(this.bot);
+        this.subscriptionHandler = new SubscriptionHandler(this.bot, this.persistence.getData());
+        this.persistence.start();
     }
 
     public sendGlobalAlert(message: string): void {
         this.subscriptionHandler.sendToSubscribers(message);
+    }
+
+    public getPersistenceData(): ChatIdList {
+        return this.subscriptionHandler ?
+            this.subscriptionHandler.getPersistenceData() :
+            [];
     }
 }

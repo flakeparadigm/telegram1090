@@ -9,81 +9,30 @@ interface Position {
 }
 
 export interface Flight extends Position {
-    generatedDate: string;
-    generatedTime: string;
-    hexIdent: string;
+    generated_date: string;
+    generated_time: string;
+    hex_ident: string;
     callsign: string;
     path: Position[];
 }
 
+export type FlightList = Flight[];
+
 export class FlightCollection {
+    // contains all flights
     private readonly flightsByHex: { [hexIdent: string]: Flight } = {};
+
+    // contains only flights that announce a callsign
     private readonly flightsByCallsign: { [callsign: string]: Flight } = {};
 
-    private hasPosition(position: Position): boolean {
-        return !!(
-            position.altitude &&
-            position.lat &&
-            position.lon
-        );
-    }
+    public constructor(flights: FlightList) {
+        flights.forEach((flight) => {
+            this.flightsByHex[flight.hex_ident] = flight;
 
-    private isMessageNewer(flight: Flight, message: sbs1.Message): boolean {
-        const flightDate = flight.generatedDate.replace(/\//g, '-');
-        const flightTimestamp = `${flightDate}T${flight.generatedTime}`;
-
-        const messageDate = message.generated_date.replace(/\//g, '-');
-        const messageTimestamp = `${messageDate}T${message.generated_time}`;
-
-        return messageTimestamp > flightTimestamp;
-    }
-
-    private insertFlight(message: sbs1.Message): Flight {
-        const position = _.pick(message, ['altitude', 'lat', 'lon']);
-        const newFlight: Flight = {
-            generatedDate: message.generated_date,
-            generatedTime: message.generated_time,
-            hexIdent: message.hex_ident,
-            callsign: message.callsign,
-            path: [],
-            ...position
-        };
-
-        // prevent adding empty positions to path
-        if (this.hasPosition(position)) {
-            newFlight.path.push(position);
-        }
-
-        this.flightsByHex[message.hex_ident] = newFlight;
-
-        return newFlight;
-    }
-
-    private mergeFlight(flight: Flight, message: sbs1.Message): void {
-        // drop messages processed out of order
-        if (!this.isMessageNewer(flight, message)) {
-            return;
-        }
-
-        // extend with non-null values
-        for (const key in flight) {
-            const newValue = (message as any)[key];
-
-            if (newValue !== null && newValue !== undefined) {
-                (flight as any)[key] = newValue;
+            if (flight.callsign) {
+                this.flightsByCallsign[flight.callsign] = flight;
             }
-        }
-
-        // track the flightpath, guessing at missing values
-        const previousPosition = _.last(flight.path);
-        const newPosition = _.pick(flight, ['altitude', 'lat', 'lon']);
-
-        if (
-            this.hasPosition(newPosition) &&
-            !_.isEqual(newPosition, previousPosition)
-        ) {
-            flight.path.push(newPosition);
-        }
+        });
     }
 
     public updateFlight(message: sbs1.Message): void {
@@ -112,6 +61,10 @@ export class FlightCollection {
         return Object.keys(this.flightsByCallsign).sort();
     }
 
+    public getAllFlights(): Flight[] {
+        return Object.values(this.flightsByHex);
+    }
+
     public getFlightsInRange(latitude: number, longitude: number, radius: number): Flight[] {
         return _.filter(
             this.flightsByCallsign,
@@ -130,5 +83,70 @@ export class FlightCollection {
                 );
             }
         ) ;
+    }
+
+    private hasPosition(position: Position): boolean {
+        return !!(
+            position.altitude &&
+            position.lat &&
+            position.lon
+        );
+    }
+
+    private isMessageNewer(flight: Flight, message: sbs1.Message): boolean {
+        const flightDate = flight.generated_date.replace(/\//g, '-');
+        const flightTimestamp = new Date(`${flightDate}T${flight.generated_time}`);
+
+        const messageDate = message.generated_date.replace(/\//g, '-');
+        const messageTimestamp = new Date(`${messageDate}T${message.generated_time}`);
+
+        return messageTimestamp > flightTimestamp;
+    }
+
+    private insertFlight(message: sbs1.Message): Flight {
+        const position = _.pick(message, ['altitude', 'lat', 'lon']);
+        const newFlight: Flight = {
+            generated_date: message.generated_date,
+            generated_time: message.generated_time,
+            hex_ident: message.hex_ident,
+            callsign: message.callsign,
+            path: [],
+            ...position
+        };
+
+        // prevent adding empty positions to path
+        if (this.hasPosition(position)) {
+            newFlight.path.push(position);
+        }
+
+        this.flightsByHex[message.hex_ident] = newFlight;
+
+        return newFlight;
+    }
+
+    private mergeFlight(flight: Flight, message: sbs1.Message): void {
+        // drop messages processed out of order
+        if (!this.isMessageNewer(flight, message)) {
+            return;
+        }
+
+        const flightKeys = Object.keys(flight);
+        Object.assign(
+            flight,
+            _.pick(message, (value: unknown, key: string) => (
+                value !== null && value !== undefined && flightKeys.includes(key))
+            )
+        );
+
+        // track the flightpath, guessing at missing values
+        const previousPosition = _.last(flight.path);
+        const newPosition = _.pick(flight, ['altitude', 'lat', 'lon']);
+
+        if (
+            this.hasPosition(newPosition) &&
+            !_.isEqual(newPosition, previousPosition)
+        ) {
+            flight.path.push(newPosition);
+        }
     }
 }

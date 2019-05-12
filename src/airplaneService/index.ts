@@ -26,7 +26,7 @@ export class AirplaneService {
 
     public constructor(config: AppConfig) {
         this.config = config;
-        this.flights = new FlightCollection();
+        this.flights = new FlightCollection([]);
 
         const sbsOptions: sbs1.Options = {
             host: config.dump1090_host,
