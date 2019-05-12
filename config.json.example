@@ -7,7 +7,7 @@
     "home_range": 750,
 
     "persistence_base_dir": "./persisted",
-    "persistence_save_interval": 60000,
+    "persistence_save_interval": 600000,
 
     "telegram_token": "Retrieved from Botfather"
 }

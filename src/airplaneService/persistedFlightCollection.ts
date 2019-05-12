@@ -29,9 +29,9 @@ export class PersistedFlightCollection extends FlightCollection {
     private runChecks(): void {
         if (this.persistence.getSize() > MAX_SAVE_SIZE) {
             console.log('---');
-            console.log('Before: ', this.getAllHexes());
+            console.log('Before: ', this.getAllHexes().length);
             const flights = this.pruneOlderThan(Date.now() - this.config.persistence_save_interval);
-            console.log('After: ', this.getAllHexes());
+            console.log('After: ', this.getAllHexes().length);
 
             // halt old persistence service, saving only the pruned flights
             this.persistence.setFetcher(() => flights);
