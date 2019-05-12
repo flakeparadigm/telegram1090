@@ -6,9 +6,9 @@ import { AppConfig } from '../loadConfig';
 const IMPLEMENTATION = JsonPersistence;
 
 export class PersistenceService<T> {
-    private readonly fetcher: DataFetcher<T>;
     private readonly implementation: PersistenceImplementation<T>;
     private readonly intervalTime: number;
+    private fetcher: DataFetcher<T>;
     private intervalHandle: NodeJS.Timeout | null = null;
 
     public constructor(name: string, fetcher: DataFetcher<T>, config: AppConfig) {
@@ -21,14 +21,24 @@ export class PersistenceService<T> {
         return this.implementation.load();
     }
 
+    public getSize(): number {
+        return this.implementation.getSize();
+    }
+
+    public setFetcher(fetcher: DataFetcher<T>): void {
+        this.fetcher = fetcher;
+    }
+
     public start(): void {
         this.intervalHandle = setInterval(this.saveCallback.bind(this), this.intervalTime);
+        this.saveCallback();
     }
 
     public stop(): void {
         if (this.intervalHandle !== null) {
             clearInterval(this.intervalHandle);
         }
+        this.saveCallback();
     }
 
     private saveCallback(): void {

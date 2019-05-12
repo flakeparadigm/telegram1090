@@ -31,4 +31,12 @@ export class JsonPersistence<T> implements PersistenceImplementation<T> {
             return this.defaultValue;
         }
     }
+
+    public getSize(): number {
+        const file = fs.openSync(this.path, 'r');
+        const size = fs.fstatSync(file).size;
+
+        fs.closeSync(file);
+        return size;
+    }
 }

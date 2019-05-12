@@ -2,6 +2,7 @@ import _ from 'underscore';
 import * as sbs1 from 'sbs1';
 import { AppConfig } from '../loadConfig';
 import { FlightCollection, Flight } from './flightCollection';
+import { PersistedFlightCollection } from './persistedFlightCollection';
 
 /**
  * Airplane Service
@@ -26,7 +27,7 @@ export class AirplaneService {
 
     public constructor(config: AppConfig) {
         this.config = config;
-        this.flights = new FlightCollection([]);
+        this.flights = new PersistedFlightCollection(config);
 
         const sbsOptions: sbs1.Options = {
             host: config.dump1090_host,

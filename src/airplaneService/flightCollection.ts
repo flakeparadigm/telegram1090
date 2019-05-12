@@ -2,6 +2,11 @@ import _ from 'underscore';
 import * as sbs1 from 'sbs1';
 import { isPointInCircle } from 'geolib';
 
+interface DateTimeContainer {
+    generated_date: string;
+    generated_time: string;
+}
+
 interface Position {
     altitude: number;
     lat: number;
@@ -85,6 +90,22 @@ export class FlightCollection {
         ) ;
     }
 
+    public pruneOlderThan(timestamp: number): FlightList {
+        const oldestDate = new Date(timestamp);
+        const pruned: FlightList = [];
+
+        _.forEach(this.flightsByHex, (flight, hex) => {
+            if (this.getDate(flight) < oldestDate) {
+                pruned.push(flight);
+
+                delete this.flightsByCallsign[flight.callsign];
+                delete this.flightsByHex[hex];
+            }
+        });
+
+        return pruned;
+    }
+
     private hasPosition(position: Position): boolean {
         return !!(
             position.altitude &&
@@ -93,12 +114,15 @@ export class FlightCollection {
         );
     }
 
-    private isMessageNewer(flight: Flight, message: sbs1.Message): boolean {
-        const flightDate = flight.generated_date.replace(/\//g, '-');
-        const flightTimestamp = new Date(`${flightDate}T${flight.generated_time}`);
+    private getDate(container: DateTimeContainer): Date {
+        const fixedDate = container.generated_date.replace(/\//g, '-');
 
-        const messageDate = message.generated_date.replace(/\//g, '-');
-        const messageTimestamp = new Date(`${messageDate}T${message.generated_time}`);
+        return new Date(`${fixedDate}T${container.generated_time}`);
+    }
+
+    private isMessageNewer(flight: Flight, message: sbs1.Message): boolean {
+        const flightTimestamp = this.getDate(flight);
+        const messageTimestamp = this.getDate(message);
 
         return messageTimestamp > flightTimestamp;
     }
