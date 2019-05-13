@@ -3,8 +3,8 @@ import { AppConfig } from '../loadConfig';
 import { PersistenceService } from '../persistenceService';
 
 const FILE_PREFIX = 'flights';
-const DELAY_MULTIPLIER = 1;
-const MAX_SAVE_SIZE = 500 * 1000; // in bytes
+const DELAY_MULTIPLIER = 2;
+const MAX_SAVE_SIZE = 1000 * 1000; // in bytes
 
 export class PersistedFlightCollection extends FlightCollection {
     private readonly config: AppConfig;
@@ -28,10 +28,7 @@ export class PersistedFlightCollection extends FlightCollection {
 
     private runChecks(): void {
         if (this.persistence.getSize() > MAX_SAVE_SIZE) {
-            console.log('---');
-            console.log('Before: ', this.getAllHexes().length);
             const flights = this.pruneOlderThan(Date.now() - this.config.persistence_save_interval);
-            console.log('After: ', this.getAllHexes().length);
 
             // halt old persistence service, saving only the pruned flights
             this.persistence.setFetcher(() => flights);
