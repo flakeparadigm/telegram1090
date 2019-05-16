@@ -17,6 +17,9 @@
     "url": "https://github.com/flakeparadigm/telegram1090/issues"
   },
   "homepage": "https://github.com/flakeparadigm/telegram1090#readme",
+  "engines": {
+    "node": ">=10.0.0"
+  },
   "devDependencies": {
     "@types/node": "^10.14.1",
     "@types/node-telegram-bot-api": "^0.30.4",

@@ -2,20 +2,14 @@ import _ from 'underscore';
 import * as sbs1 from 'sbs1';
 import { isPointInCircle } from 'geolib';
 
-interface DateTimeContainer {
-    generated_date: string;
-    generated_time: string;
-}
-
 interface Position {
+    timestamp: Date;
     altitude: number;
     lat: number;
     lon: number;
 }
 
 export interface Flight extends Position {
-    generated_date: string;
-    generated_time: string;
     hex_ident: string;
     callsign: string;
     path: Position[];
@@ -95,7 +89,7 @@ export class FlightCollection {
         const pruned: FlightList = [];
 
         _.forEach(this.flightsByHex, (flight, hex) => {
-            if (this.getDate(flight) < oldestDate) {
+            if (flight.timestamp < oldestDate) {
                 pruned.push(flight);
 
                 delete this.flightsByCallsign[flight.callsign];
@@ -114,29 +108,30 @@ export class FlightCollection {
         );
     }
 
-    private getDate(container: DateTimeContainer): Date {
+    private getDate(container: sbs1.Message): Date {
         const fixedDate = container.generated_date.replace(/\//g, '-');
 
         return new Date(`${fixedDate}T${container.generated_time}`);
     }
 
     private isMessageNewer(flight: Flight, message: sbs1.Message): boolean {
-        const flightTimestamp = this.getDate(flight);
+        const flightTimestamp = flight.timestamp;
         const messageTimestamp = this.getDate(message);
 
         return messageTimestamp > flightTimestamp;
     }
 
     private insertFlight(message: sbs1.Message): Flight {
-        const position = _.pick(message, ['altitude', 'lat', 'lon']);
         const newFlight: Flight = {
-            generated_date: message.generated_date,
-            generated_time: message.generated_time,
+            timestamp: this.getDate(message),
             hex_ident: message.hex_ident,
             callsign: message.callsign,
-            path: [],
-            ...position
+            altitude: message.altitude,
+            lat: message.lat,
+            lon: message.lon,
+            path: []
         };
+        const position = _.pick(newFlight, ['timestamp', 'altitude', 'lat', 'lon']);
 
         // prevent adding empty positions to path
         if (this.hasPosition(position)) {
@@ -150,7 +145,9 @@ export class FlightCollection {
 
     private mergeFlight(flight: Flight, message: sbs1.Message): void {
         // drop messages processed out of order
-        if (!this.isMessageNewer(flight, message)) {
+        const messageTimestamp = this.getDate(message);
+
+        if (messageTimestamp < flight.timestamp) {
             return;
         }
 
@@ -161,14 +158,15 @@ export class FlightCollection {
                 value !== null && value !== undefined && flightKeys.includes(key))
             )
         );
+        flight.timestamp = this.getDate(message);
 
         // track the flightpath, guessing at missing values
-        const previousPosition = _.last(flight.path);
-        const newPosition = _.pick(flight, ['altitude', 'lat', 'lon']);
+        const previousPosition = flight.path[flight.path.length - 1];
+        const newPosition: Position = _.pick(flight, ['timestamp', 'altitude', 'lat', 'lon']);
 
         if (
             this.hasPosition(newPosition) &&
-            !_.isEqual(newPosition, previousPosition)
+            !_.isEqual(_.omit(newPosition, ['timestamp']), _.omit(previousPosition, ['timestamp']))
         ) {
             flight.path.push(newPosition);
         }

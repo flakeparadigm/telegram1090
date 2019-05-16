@@ -17,6 +17,7 @@
         "no-undef": "off",
         "no-useless-constructor": "off",
         "@typescript-eslint/no-unused-vars": "off",
-        "@typescript-eslint/camelcase": "off"
+        "@typescript-eslint/camelcase": "off",
+        "@typescript-eslint/explicit-function-return-type": ["error", { "allowExpressions": true }]
     }
 }
