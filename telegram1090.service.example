@@ -1,0 +1,20 @@
+# telegram1090 service for systemd
+
+[Unit]
+Description=telegram1090 service used for sending telegram notifications about nearby planes
+Documentation=https://github.com/flakeparadigm/telegram1090/
+Wants=dump1090-fa.service
+After=dump1090-fa.service
+
+[Service]
+User=execUser
+Environment=PATH=$PATH:/path/to/node/bin/directory
+WorkingDirectory=/path/to/telegram1090/repo
+ExecStart=/bin/bash -c ./start.sh
+SyslogIdentifier=telegram1090
+Type=simple
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=default.target

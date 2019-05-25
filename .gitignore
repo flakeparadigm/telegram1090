@@ -2,6 +2,7 @@
 dist
 persisted
 config.json
+telegram1090.service
 
 # Logs
 logs
