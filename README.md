@@ -32,3 +32,9 @@ An airplane tracking bot that supplies users with data from a dump1090 datasourc
 
 #### Updating
 If updates are availble, simply `git pull origin` to update your local repo, run `npm run build`, and restart the service `sudo systemctl restart telegram1090` or reboot.
+
+## Extra reading
+- How Flightradar24 (and other similar sites) works. https://habr.com/en/post/440596/
+- Introduction to ADS-B. `https://www.icao.int/APAC/Meetings/2012_SEA_BOB_ADSB_WG8/SP01_AUS - ADS-B Basics.pdf` (Copy and paste this including the spaces. Their site has some struggles with the escape characters in the URL)
+- Telegram Bots. https://core.telegram.org/bots
+- Creating systemd services. https://www.linode.com/docs/quick-answers/linux/start-service-at-boot/
