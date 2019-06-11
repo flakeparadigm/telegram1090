@@ -1,6 +1,8 @@
 # Telegram 1090
 An airplane tracking bot that supplies users with data from a dump1090 datasource.
 
+Read more about my setup on my blog: https://tyler.nien.house/2019/06/whats-that-plane-i-hear-telegram1090/
+
 ## Bot features
 ### Commands
 - `subscribe` - Subscribe to notifications of nearby planes
