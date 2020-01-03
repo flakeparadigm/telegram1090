@@ -11,7 +11,7 @@ Read more about my setup on my blog: https://tyler.nien.house/2019/06/whats-that
 ## Setup
 ### RaspberryPi/Raspbian
 1. Install `dump1090` - FlightAware's fork of it is available through their official Raspbian repo. You can follow [the instructions on their site](https://flightaware.com/adsb/piaware/install), skipping the PiAware installation and going straight to the dump1090-fa installation. The great thing about the FlightAware fork is it automatically runs at boot and provides a nice web UI to check your data.
-1. Install Node.js 10 or newer - The required version isn't included in Raspbian's default repos, so you can will need to either get it directly from the [Node.js website](https://nodejs.org/en/), from [NodeSource's binary packages](https://github.com/nodesource/distributions), or using [nvm](https://github.com/nvm-sh/nvm).
+1. Install Node.js 10 or newer - If the required version isn't included in Raspbian's default repos, you many need to either get it directly from the [Node.js website](https://nodejs.org/en/), from [NodeSource's binary packages](https://github.com/nodesource/distributions), or using [nvm](https://github.com/nvm-sh/nvm).
 1. Clone this repo to a convenient location - `git clone https://github.com/flakeparadigm/telegram1090.git`
 1. Prepare the configuration - copy `config.json.example` to `config.json` and updated the values where necessary. Primarily the home lat/lon and telegram token.
 1. Run the bot in the foreground - `npm start` in the repo directory.
