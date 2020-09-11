@@ -1,6 +1,6 @@
 import _ from 'underscore';
-import * as sbs1 from 'sbs1';
-import { isPointInCircle } from 'geolib';
+import { SBS1Message } from 'sbs1';
+import { isPointWithinRadius } from 'geolib';
 
 interface Position {
     timestamp: Date;
@@ -34,7 +34,7 @@ export class FlightCollection {
         });
     }
 
-    public updateFlight(message: sbs1.Message): void {
+    public updateFlight(message: SBS1Message): void {
         const callsign = message.callsign ? message.callsign.trim() : null;
         let flight = this.flightsByHex[message.hex_ident];
 
@@ -75,7 +75,7 @@ export class FlightCollection {
                     longitude: flight.lon
                 };
 
-                return isPointInCircle(
+                return isPointWithinRadius(
                     flightCoordinates,
                     { latitude, longitude },
                     radius
@@ -108,20 +108,20 @@ export class FlightCollection {
         );
     }
 
-    private getDate(container: sbs1.Message): Date {
+    private getDate(container: SBS1Message): Date {
         const fixedDate = container.generated_date.replace(/\//g, '-');
 
         return new Date(`${fixedDate}T${container.generated_time}`);
     }
 
-    private isMessageNewer(flight: Flight, message: sbs1.Message): boolean {
+    private isMessageNewer(flight: Flight, message: SBS1Message): boolean {
         const flightTimestamp = flight.timestamp;
         const messageTimestamp = this.getDate(message);
 
         return messageTimestamp > flightTimestamp;
     }
 
-    private insertFlight(message: sbs1.Message): Flight {
+    private insertFlight(message: SBS1Message): Flight {
         const newFlight: Flight = {
             timestamp: this.getDate(message),
             hex_ident: message.hex_ident,
@@ -143,7 +143,7 @@ export class FlightCollection {
         return newFlight;
     }
 
-    private mergeFlight(flight: Flight, message: sbs1.Message): void {
+    private mergeFlight(flight: Flight, message: SBS1Message): void {
         // drop messages processed out of order
         const messageTimestamp = this.getDate(message);
 

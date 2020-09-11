@@ -1,3 +1,3 @@
 #!/bin/bash
 
-node ./dist/index.js
+NTBA_FIX_319=set node ./dist/index.js

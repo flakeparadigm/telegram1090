@@ -29,7 +29,7 @@ export class AirplaneService {
         this.config = config;
         this.flights = new PersistedFlightCollection(config);
 
-        const sbsOptions: sbs1.Options = {
+        const sbsOptions: sbs1.SBS1Options = {
             host: config.dump1090_host,
             port: config.dump1090_port
         };
@@ -37,7 +37,7 @@ export class AirplaneService {
         this.sbsClient.on('message', this.onMessage.bind(this));
     }
 
-    private normalizeMessage(message: sbs1.Message): sbs1.Message {
+    private normalizeMessage(message: sbs1.SBS1Message): sbs1.SBS1Message {
         // call signs are received as fixed length with padding, remove this
         if (message.callsign) {
             message.callsign = message.callsign.trim();
@@ -46,7 +46,7 @@ export class AirplaneService {
         return message;
     }
 
-    private onMessage(rawMsg: sbs1.Message): void {
+    private onMessage(rawMsg: sbs1.SBS1Message): void {
         if (
             !rawMsg.hex_ident ||
             !rawMsg.generated_date ||
