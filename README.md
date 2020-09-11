@@ -3,12 +3,7 @@ An airplane tracking bot that supplies users with data from a dump1090 datasourc
 
 Read more about my setup on my blog: https://tyler.nien.house/2019/06/whats-that-plane-i-hear-telegram1090/
 
-## Bot features
-### Commands
-- `subscribe` - Subscribe to notifications of nearby planes
-- `unsubscribe` - End notifications of nearby planes
-
-## Setup
+## 1. Setup/Installation
 ### RaspberryPi/Raspbian
 1. Install `dump1090` - FlightAware's fork of it is available through their official Raspbian repo. You can follow [the instructions on their site](https://flightaware.com/adsb/piaware/install), skipping the PiAware installation and going straight to the dump1090-fa installation. The great thing about the FlightAware fork is it automatically runs at boot and provides a nice web UI to check your data.
 1. Install Node.js 10 or newer - If the required version isn't included in Raspbian's default repos, you many need to either get it directly from the [Node.js website](https://nodejs.org/en/), from [NodeSource's binary packages](https://github.com/nodesource/distributions), or using [nvm](https://github.com/nvm-sh/nvm).
@@ -34,6 +29,16 @@ Read more about my setup on my blog: https://tyler.nien.house/2019/06/whats-that
 
 #### Updating
 If updates are availble, simply `git pull origin` to update your local repo, run `npm run build`, and restart the service `sudo systemctl restart telegram1090` or reboot.
+
+## 2. Bot notifications
+After you have the service running, you'll need to start a Telegram chat with the bot and subscribe to the notifications using the `subscribe` command.
+
+### Commands
+#### subscribe
+Subscribes you to the notification messages and must be done before the bot is able to send you any messages. The service saves any subscribed chats to a file perioditcally, so it should be able to maintain the chats between restarts.
+
+#### unsubscribe
+Removes your subscription to the notification messages. After running this command you should no longer receive any messages from this bot.
 
 ## Extra reading
 - How Flightradar24 (and other similar sites) works. https://habr.com/en/post/440596/
