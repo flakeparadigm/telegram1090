@@ -1,4 +1,3 @@
-import { PersistenceServiceError } from './persistenceServiceError';
 import { JsonPersistence } from './jsonPersistence';
 import { DataFetcher, PersistenceImplementation } from './persistenceImplementation';
 import { AppConfig } from '../loadConfig';
