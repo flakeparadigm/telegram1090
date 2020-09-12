@@ -44,7 +44,7 @@ export class SubscriptionHandler {
             this.bot.sendMessage(
                 chatId,
                 message,
-                { parse_mode: 'Markdown' }
+                { parse_mode: 'MarkdownV2' }
             );
         });
     }

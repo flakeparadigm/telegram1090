@@ -11,7 +11,7 @@ let prevInRange: Flight[] = [];
 
 function notifySubscribers(flight: Flight): void {
     telegramService.sendGlobalAlert(
-        `Do you hear that? Flight *${flight.callsign}* is passing by.\nhttps://flightaware.com/live/flight/${flight.callsign}`
+        `Do you hear that? Flight *${flight.callsign}* is passing by\\.\nhttps://flightaware.com/live/flight/${flight.callsign}`
     );
 }
 
