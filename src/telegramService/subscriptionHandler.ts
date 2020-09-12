@@ -17,8 +17,9 @@ export class SubscriptionHandler {
     }
 
     private registerListeners(): void {
-        this.bot.onText(/^\/?subscribe/, this.subscribe.bind(this));
-        this.bot.onText(/^\/?unsubscribe/, this.unsubscribe.bind(this));
+        this.bot.onText(/^\/?[sS]ubscribe/, this.subscribe.bind(this));
+        this.bot.onText(/^\/?[uU]nsubscribe/, this.unsubscribe.bind(this));
+        this.bot.onText(/^\/?[sS]tatus/, this.status.bind(this));
     }
 
     private subscribe(message: TelegramBot.Message): void {
@@ -37,6 +38,24 @@ export class SubscriptionHandler {
 
         this.registeredChats = this.registeredChats.filter((storedId) => storedId !== chatId);
         this.bot.sendMessage(chatId, 'Unsubscribe successful.');
+    }
+
+    private status(message: TelegramBot.Message): void {
+        const chatId = message.chat.id;
+
+        if (this.registeredChats.includes(chatId)) {
+            this.bot.sendMessage(
+                chatId,
+                'You are subscribed to updates\\.\nUse `/unsubscribe` to stop receiving updates',
+                { parse_mode: 'MarkdownV2' }
+            );
+        } else {
+            this.bot.sendMessage(
+                chatId,
+                'You are NOT subscribed to updates\\.\nUse `/subscribe` to start receiving updates',
+                { parse_mode: 'MarkdownV2' }
+            );
+        }
     }
 
     public sendToSubscribers(message: string): void {

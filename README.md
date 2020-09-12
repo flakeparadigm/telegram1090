@@ -40,6 +40,9 @@ Subscribes you to the notification messages and must be done before the bot is a
 #### unsubscribe
 Removes your subscription to the notification messages. After running this command you should no longer receive any messages from this bot.
 
+#### status
+Respons to you with your current subscription status without changing it.
+
 ## Extra reading
 - How Flightradar24 (and other similar sites) works. https://habr.com/en/post/440596/
 - Introduction to ADS-B. `https://www.icao.int/APAC/Meetings/2012_SEA_BOB_ADSB_WG8/SP01_AUS - ADS-B Basics.pdf` (Copy and paste this including the spaces. Their site has some struggles with escape characters in URLs)
