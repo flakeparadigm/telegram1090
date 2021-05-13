@@ -36,6 +36,6 @@
     "node-telegram-bot-api": "^0.50.0",
     "sbs1": "flakeparadigm/node-sbs1#master",
     "ts-node": "^9.0.0",
-    "underscore": "^1.11.0"
+    "underscore": "^1.12.1"
   }
 }
